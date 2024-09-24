@@ -22,12 +22,12 @@ Intersects <- Hospital%>%
   arrange(-Cases)
 head(Intersects)
 
-#Combinig both tables
+#Combining both tables
 total <- data.frame(full_join(Intersects,
                     Clinics_Center, by = c("Center")))
 head(total)
 
-#Making it useful
+#Making it useful by getting the rations
 Result <- total %>%
           mutate(Perc. = (total$Cases/total$n)*100)%>%
           as.data.frame()
@@ -38,6 +38,7 @@ Result <- arrange(Result,-Result$`Percentage (%)`)
 
 View(Result)
 
+#Visualizing
 Clinic_Visits <- ggplot(data = Result, aes(x = "", y = `Percentage (%)`, fill = Clinic)) +
   geom_bar(width = 1, stat = "identity") +
   coord_polar(theta = "y") +
@@ -54,12 +55,14 @@ Clinic_Visits <- ggplot(data = Result, aes(x = "", y = `Percentage (%)`, fill = 
 ggsave("Clinic_Visits.jpeg", plot = Clinic_Visits, width = 8, height = 7, dpi = 300)
 
 
+#The pattern of monthly clinics visits during the year
 Monthly_Visits<-Hospital%>%
                      group_by(Clinic,month(Timestamp))%>%
                      summarise(Visits=n())
 colnames(Monthly_Visits) <- 
   c("Clinic","Month","Visits")
 
+#Visualizing
 Visiting_Pattern <- ggplot(data = Monthly_Visits) +
   geom_col(mapping = aes(x = Month, y = Visits)) +
   facet_wrap(~Clinic) +
@@ -71,12 +74,14 @@ Visiting_Pattern <- ggplot(data = Monthly_Visits) +
 ggsave("Visiting_Pattern.jpeg", plot = Visiting_Pattern, width = 10, height = 8, dpi = 300)
 
 
+#The probability of getting hospitalized in each clinic
 Hospitalization <- Hospital%>%
   filter(Hospitalization != "Not Hospitalized",
          Clinic != "Reception")%>%
   group_by(Clinic)%>%
   summarise(Hospitalized=n())
 
+#Visualizing
 Hospitalization_Plot <- ggplot(data=Hospitalization)+
   geom_col(mapping = aes(x = Clinic, y = Hospitalized))+
   labs(title = "   Hospitalization Rate",
