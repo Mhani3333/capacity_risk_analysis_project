@@ -63,14 +63,20 @@ colnames(Monthly_Visits) <-
   c("Clinic","Month","Visits")
 
 #Visualizing
+Monthly_Visits$Month <- factor(Monthly_Visits$Month, levels = 1:12, 
+                               labels = c("January", "February", "March", "April", 
+                                          "May", "June", "July", "August", 
+                                          "September", "October", "November", "December"))
+
 Visiting_Pattern <- ggplot(data = Monthly_Visits) +
   geom_col(mapping = aes(x = Month, y = Visits)) +
   facet_wrap(~Clinic) +
-  labs(title = "   Clinics Monthly Visits",
+  labs(title = "Clinics Monthly Visits",
        subtitle = "Volume of Visits per Clinic each Month") +
   theme(
     plot.title = element_text(size = 20),
-    plot.subtitle = element_text(size = 14))
+    plot.subtitle = element_text(size = 14),
+    axis.text.x = element_text(angle = 90, hjust = 1))
 ggsave("Visiting_Pattern.jpeg", plot = Visiting_Pattern, width = 10, height = 8, dpi = 300)
 
 
