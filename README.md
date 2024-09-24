@@ -1,4 +1,4 @@
-# labor_health_analysis_project
+# Labor_Health_Analysis_Project
 The primary goal of the project was to increase prevention and control the causes leading to medical issues in the centers. By doing so, we aimed to protect workers' health, improve productivity, and reduce the amount of time lost due to hospital visits.
 
 ## Project Overview
@@ -18,3 +18,15 @@ Unskilled staff were responsible for recording the data, leading to errors and a
 ## Data Collection Transformation
 The first step was to digitize the data collection process using a Google Form that standardized the input options.
 This simple change improved data integrity and simplified validation. Data was automatically collected in a Google Sheet, making it easier to monitor, clean, and save.
+
+# Key Insights and Findings
+1. Surgery, Orthopedic, and Dermatology departments were the most visited.
+2. Seasonal patterns were found, with higher visits in summer months.
+3. Hospitalization rates were highest in the Surgery department.
+
+## Confidentiality Notice
+**For confidentiality reasons**, certain sensitive information has been omitted from this project. Specifically:
+- The **name of the hospital**.
+- Detailed information about the **labor centers**.
+- The **official name** of the Central Constructions Labor Zone.
+- Any personal information, including **patients' names**, has been coded (ID).
