@@ -10,35 +10,50 @@ library(RColorBrewer)
 library(lubridate)
 library(skimr)
 
-#Total Number of Patients from each Center
+#STEP 1 : Total Number of Patients from Each Center
+#The first analysis involved calculating how many patients from each labor center visited the hospital.
+#This helped in understanding which centers were sending the most workers for treatment.
+
 Clinics_Center <- count(Hospital%>%
                           group_by(Center))
 head(Clinics_Center)
 
-#Patients in each Clinic from each Center
+##STEP 2 : Patient Distribution Across Hospital Departments (Clinics)
+#Next, I explored how many patients from each center visited the different hospital clinics.
+#This gave a clear picture of which medical issues were most common across the centers.
+
 Intersects <- Hospital%>%
   group_by(Center,Clinic) %>% 
   summarise(Cases=n())%>%
   arrange(-Cases)
 head(Intersects)
 
-#Combining both tables
+##STEP 3 : Matching Data from Both Analyses
+#We combined the data from Step 1 and Step 2
+#to get a complete picture of the patient distribution across centers and clinics.
+
 total <- data.frame(full_join(Intersects,
                     Clinics_Center, by = c("Center")))
 head(total)
 
-#Making it useful by getting the rations
+##STEP 4 : Ratio Analysis for Clinic Visits
+#To make the analysis more accurate, I calculated the percentage of clinic visitors relative to the total patients from each center.
+#This accounted for the unequal distribution of workers across the centers, providing a better understanding of which centers had more serious health issues.
+#For example, if two centers had 100 patients in the surgery department but: 
+#one had a total of 700 workers and the other only 250, the second center would have a higher rate of issues.
+
 Result <- total %>%
           mutate(Perc. = (total$Cases/total$n)*100)%>%
           as.data.frame()
 colnames(Result) <- 
   c("Center","Clinic","Patients_in_Clinic","Total_Patients_of_Center","Percentage (%)")
 Result <- arrange(Result,-Result$`Percentage (%)`)
-
-
 View(Result)
 
-#Visualizing
+##Visualization of Clinic Visits by Center
+#I then visualized the percentage of patients visiting each clinic across all centers.
+#This visualization highlighted which clinics were most frequently visited and from which centers.
+
 Clinic_Visits <- ggplot(data = Result, aes(x = "", y = `Percentage (%)`, fill = Clinic)) +
   geom_bar(width = 1, stat = "identity") +
   coord_polar(theta = "y") +
@@ -52,21 +67,22 @@ Clinic_Visits <- ggplot(data = Result, aes(x = "", y = `Percentage (%)`, fill = 
   theme(
     plot.title = element_text(size = 20),
     plot.subtitle = element_text(size = 14))
-ggsave("Clinic_Visits.jpeg", plot = Clinic_Visits, width = 8, height = 7, dpi = 300)
 
+#STEP 5 : Clinic Visit Patterns Over 12 Months
+#Then I analyzed the monthly trends of visits to each clinic to understand seasonal patterns or recurring issue
 
-#The pattern of monthly clinics visits during the year
 Monthly_Visits<-Hospital%>%
                      group_by(Clinic,month(Timestamp))%>%
                      summarise(Visits=n())
 colnames(Monthly_Visits) <- 
   c("Clinic","Month","Visits")
-
-#Visualizing
 Monthly_Visits$Month <- factor(Monthly_Visits$Month, levels = 1:12, 
                                labels = c("January", "February", "March", "April", 
                                           "May", "June", "July", "August", 
                                           "September", "October", "November", "December"))
+head(Monthly_Visits)
+
+#Visualizing
 
 Visiting_Pattern <- ggplot(data = Monthly_Visits) +
   geom_col(mapping = aes(x = Month, y = Visits)) +
@@ -77,10 +93,14 @@ Visiting_Pattern <- ggplot(data = Monthly_Visits) +
     plot.title = element_text(size = 20),
     plot.subtitle = element_text(size = 14),
     axis.text.x = element_text(angle = 90, hjust = 1))
-ggsave("Visiting_Pattern.jpeg", plot = Visiting_Pattern, width = 10, height = 8, dpi = 300)
 
+## >> Insight: Nearly half of the clinics showed increased visits during the summer months.
+#This suggested a need for further investigation into how environmental factors, such as heat and poor living conditions, might be impacting workers' health.
 
-#The probability of getting hospitalized in each clinic
+#STEP 6 : Hospitalization Rates by Clinic
+#I then analyzed the chances of patients being hospitalized for more than one night in each clinic.
+#This giving insight into which clinics had more serious cases that required extended medical attention.
+
 Hospitalization <- Hospital%>%
   filter(Hospitalization != "Not Hospitalized",
          Clinic != "Reception")%>%
@@ -95,4 +115,3 @@ Hospitalization_Plot <- ggplot(data=Hospitalization)+
   theme(plot.title = element_text(size = 20),
         plot.subtitle = element_text(size = 14),
    axis.text.x = element_text(angle=25))
-ggsave("Hospitalization_Plot.jpeg", plot = Hospitalization_Plot, width = 10, height = 8, dpi = 300)
