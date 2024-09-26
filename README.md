@@ -30,3 +30,5 @@ This simple change improved data integrity and simplified validation. Data was a
 - Detailed information about the **labor centers**.
 - The **official name** of the Central Constructions Labor Zone.
 - Any personal information, including **patients' names**, has been coded (ID).
+
+## Check attached R viz
