@@ -17,6 +17,14 @@ library(skimr)
 Clinics_Center <- count(Hospital%>%
                           group_by(Center))
 head(Clinics_Center)
+#Results as follows:
+# A tibble: 6 × 2
+# Groups:   Center [6]
+#    Center        n
+#     <chr>     <int>
+#  1 Center 1    207
+#  2 Center 10    68
+#  3 Center 11    96
 
 ##STEP 2 : Patient Distribution Across Hospital Departments (Clinics)
 #Next, I explored how many patients from each center visited the different hospital clinics.
@@ -27,6 +35,14 @@ Intersects <- Hospital%>%
   summarise(Cases=n())%>%
   arrange(-Cases)
 head(Intersects)
+#Results as follows:
+# A tibble: 6 × 3
+# Groups:   Center [4]
+#    Center    Clinic      Cases
+#    <chr>     <chr>       <int>
+#  1 Center 7  Surgery       144
+#  2 Center 7  Dermatology   130
+#  3 Center 9  Surgery       113
 
 ##STEP 3 : Matching Data from Both Analyses
 #We combined the data from Step 1 and Step 2
@@ -35,6 +51,12 @@ head(Intersects)
 total <- data.frame(full_join(Intersects,
                     Clinics_Center, by = c("Center")))
 head(total)
+#Results as follows:
+#     Center      Clinic Cases Total_Center
+#1  Center 7     Surgery   144 568
+#2  Center 7 Dermatology   130 568
+#3  Center 9     Surgery   113 388
+
 
 ##STEP 4 : Ratio Analysis for Clinic Visits
 #To make the analysis more accurate, I calculated the percentage of clinic visitors relative to the total patients from each center.
@@ -47,8 +69,13 @@ Result <- total %>%
           as.data.frame()
 colnames(Result) <- 
   c("Center","Clinic","Patients_in_Clinic","Total_Patients_of_Center","Percentage (%)")
-Result <- arrange(Result,-Result$`Percentage (%)`)
-View(Result)
+head(Result)
+#Results as follows:
+#    Center      Clinic Patients_in_Clinic Total_Patients_of_Center Percentage (%)
+#1  Center 7     Surgery                144                      568       25.35211
+#2  Center 7 Dermatology                130                      568       22.88732
+#3  Center 9     Surgery                113                      388       29.12371
+
 
 ##Visualization of Clinic Visits by Center
 #I then visualized the percentage of patients visiting each clinic across all centers.
